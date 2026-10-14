@@ -1,3 +1,4 @@
+name: malay-schowl
 services:
   malay-schowl:
     build: .

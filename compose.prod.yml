@@ -1,6 +1,7 @@
 # Production compose used on the Schowl server by deploy/server-deploy.sh.
 # Binds to localhost only: Docker-published ports bypass ufw, and the host's
 # nginx proxies malay.schowl.com -> 127.0.0.1:3900 with the Cloudflare origin cert.
+name: malay-schowl
 services:
   malay-schowl:
     build: .
