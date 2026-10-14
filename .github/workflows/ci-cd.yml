@@ -21,7 +21,7 @@ jobs:
           for page in site/*.html; do
             grep -q '<title>' "$page" || { echo "missing <title> in $page"; exit 1; }
             grep -q 'src="theme.js"' "$page" || { echo "theme.js not loaded in $page"; exit 1; }
-            grep -q 'href="favicon.ico"' "$page" || { echo "icons not linked in $page"; exit 1; }
+            grep -q 'href="favicon.ico' "$page" || { echo "icons not linked in $page"; exit 1; }
           done
 
       - name: Build image
