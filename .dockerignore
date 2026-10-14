@@ -1,6 +1,7 @@
 .git
 .github
 .claude
+archive
 deploy
 README.md
 DEPLOY.md

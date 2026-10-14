@@ -4,13 +4,13 @@ My personal Malay study kit: three interactive study apps behind one home page.
 
 | Page | What it is |
 | --- | --- |
-| [`lessons.html`](site/lessons.html) | **Jalan ke Fasih**: 23 lessons in 4 stages (sounds → sentences → word-building → sounding natural), each with a quiz |
-| [`phrases.html`](site/phrases.html) | **Frasa Harian**: 190 everyday phrases for 19 real situations in Malaysia |
-| [`vocabulary.html`](site/vocabulary.html) | **Kata Asas**: 333 core words as picture flashcards with example sentences |
+| [`lessons.html`](site/lessons.html) | **Jalan ke Fasih**: 23 guided lessons in 4 stages (sounds → sentences → word-building → sounding natural), each with a quiz |
+| [`trainer.html`](site/trainer.html) | **Hafal**: 3,368 words and phrases in six levels (Core 333 → news & idiom, plus 190 situational phrases), with spaced repetition and flashcard, learn, write, match and test modes |
+| [`grammar.html`](site/grammar.html) | **Enjin Bahasa**: grammar reference with search and a live word builder — affixes, sound changes, sentence patterns, registers |
 
-Every page has a light/dark theme switch, text-to-speech audio (it uses a Malay voice when your device has one), a quiz mode, and saves your progress in the browser.
+Every page has a light/dark theme switch and text-to-speech audio (it uses a Malay voice when your device has one), and saves your progress in the browser.
 
-**Flashcard keys:** `←` `→` move · `L` listen · `T` quiz mode · `Enter` reveal
+**Trainer keys** (flashcards): `Space` flip · `←` `→` move · `1` again · `2` got it · `L` listen · `S` star. In Learn/Test, `1`–`4` pick an answer and `Enter` goes next.
 
 ## Where it lives
 
@@ -28,7 +28,7 @@ Every push to `main` runs the [CI/CD pipeline](.github/workflows/ci-cd.yml): it 
 ```bash
 docker compose up -d --build
 ```
-Open <http://localhost:8080>. Friendly URLs work: `/lessons`, `/phrases`, `/vocabulary`. Stop with `docker compose down`.
+Open <http://localhost:8080>. Friendly URLs work: `/lessons`, `/trainer`, `/grammar`. Stop with `docker compose down`.
 
 **Prebuilt image (amd64 + arm64):**
 ```bash
@@ -42,8 +42,8 @@ docker run -d --name malay-schowl -p 8080:80 --restart unless-stopped ghcr.io/be
 site/                 the website (plain HTML, no build step)
   index.html          home page linking the three apps
   lessons.html        course
-  phrases.html        phrase flashcards
-  vocabulary.html     vocabulary flashcards
+  trainer.html        spaced-repetition trainer
+  grammar.html        grammar engine
   theme.js            light/dark switcher shared by all pages
   favicon.*, icon-*   bunga raya icon set (+ site.webmanifest for Add to Home Screen)
 Dockerfile            nginx image serving site/
@@ -52,6 +52,7 @@ docker-compose.yml    local always-on container on :8080
 compose.prod.yml      server container, bound to 127.0.0.1:3900
 deploy/               server deploy script + nginx site for malay.schowl.com
 .github/workflows/    CI/CD: test -> Pages + GHCR image + server deploy
+archive/              retired phrase and vocabulary decks (now inside the trainer)
 ```
 
 ## Notes

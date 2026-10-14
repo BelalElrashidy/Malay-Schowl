@@ -31,10 +31,15 @@ jobs:
         run: |
           docker run -d --name app -p 8080:80 malay-schowl:test
           for i in $(seq 1 20); do curl -fs http://localhost:8080/healthz >/dev/null && break; sleep 1; done
-          for path in / /lessons /phrases /vocabulary /lessons.html /phrases.html /vocabulary.html /theme.js /favicon.svg /favicon.ico /apple-touch-icon.png /icon-192.png /icon-512.png /site.webmanifest /healthz; do
+          for path in / /lessons /trainer /grammar /lessons.html /trainer.html /grammar.html /theme.js /favicon.svg /favicon.ico /apple-touch-icon.png /icon-192.png /icon-512.png /site.webmanifest /healthz; do
             code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$path")
             echo "$code $path"
             [ "$code" = "200" ] || { docker logs app; exit 1; }
+          done
+          for path in /phrases /vocabulary.html; do
+            loc=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "http://localhost:8080$path")
+            echo "$loc $path"
+            case "$loc" in "301 "*/trainer) ;; *) echo "old deck URL $path should redirect to /trainer"; exit 1;; esac
           done
 
   pages:

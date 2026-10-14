@@ -1,0 +1,531 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Enjin Bahasa — Malay grammar engine</title>
+<meta name="description" content="How Malay words are built: roots, affixes, sound rules, sentence patterns and registers, with a live word builder.">
+<meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Malay">
+<script src="theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+</head><body>
+<style>
+:root{
+  --ground:#F2F4F1; --panel:#FFFFFF; --ink:#15213B; --muted:#5A6477; --line:#DCE1E6;
+  --red:#C23A2E; --green:#2E7A58; --gold:#A26C0B; --indigo:#2F4B8A;
+  --red-soft:#F8E4E1; --green-soft:#DFF0E7; --gold-soft:#F8EDD5; --indigo-soft:#E2E8F5;
+  --shadow:0 1px 2px rgba(21,33,59,.06),0 8px 28px rgba(21,33,59,.08);
+  --display:"Young Serif",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0D1320; --panel:#161E2E; --ink:#E8ECF3; --muted:#9AA5B8; --line:#263047;
+  --red:#EE7A6C; --green:#5FC194; --gold:#E9B650; --indigo:#8FA8E6;
+  --red-soft:#3A1F1E; --green-soft:#16332A; --gold-soft:#3A2E15; --indigo-soft:#1D2946;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  --ground:#0D1320; --panel:#161E2E; --ink:#E8ECF3; --muted:#9AA5B8; --line:#263047;
+  --red:#EE7A6C; --green:#5FC194; --gold:#E9B650; --indigo:#8FA8E6;
+  --red-soft:#3A1F1E; --green-soft:#16332A; --gold-soft:#3A2E15; --indigo-soft:#1D2946;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+}
+
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;margin:0;line-height:1.6}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.shell{display:grid;grid-template-columns:272px minmax(0,1fr);align-items:start}
+aside{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:24px 14px 40px}
+.logo{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.1;margin:0}
+.logo span{display:block;font-family:var(--body);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+#q{width:100%;margin:16px 0 10px;font:500 14px var(--body);color:var(--ink);background:var(--ground);border:1.5px solid var(--line);border-radius:10px;padding:9px 12px}
+#q:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+nav a{display:block;padding:7px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
+nav a:hover{background:var(--ground)}
+nav a.on{background:var(--indigo-soft);color:var(--indigo);font-weight:600}
+nav .grp{font:600 11px var(--body);letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:18px 10px 6px}
+main{padding:clamp(18px,4vw,48px) clamp(16px,4vw,56px) 80px;min-width:0;max-width:960px}
+.hero{border-radius:20px;padding:clamp(22px,4vw,38px);background:var(--panel);box-shadow:var(--shadow);margin-bottom:34px;border-left:6px solid var(--green)}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,5.5vw,56px);line-height:1.04;margin:6px 0 10px;text-wrap:balance}
+.hero p{margin:0;max-width:62ch;color:var(--muted);font-size:17px}
+.eyebrow{font:600 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
+section{margin:0 0 46px;scroll-margin-top:16px}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,3.6vw,36px);margin:0 0 4px;text-wrap:balance}
+h2 em{font-style:normal;color:var(--muted);font-size:17px;font-family:var(--body);display:block;margin-top:4px}
+h3{font-size:17px;margin:26px 0 8px}
+p{max-width:68ch}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel);margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th{text-align:left;font:600 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--line);background:var(--ground);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:700;white-space:nowrap}
+b.ms,.ms{color:var(--green);font-weight:700}
+.rule{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:0 14px 14px 0;padding:14px 16px;margin:16px 0}
+.rule>b:first-child{display:block;font:700 11px var(--body);letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.trap{background:var(--red-soft);border:1px solid var(--red);border-radius:14px;padding:14px 16px;margin:16px 0}
+.trap>b:first-child{display:block;font:700 11px var(--body);letter-spacing:.13em;text-transform:uppercase;color:var(--red);margin-bottom:4px}
+.ex{display:grid;gap:8px;margin:14px 0}
+.exl{background:var(--green-soft);border-radius:12px;padding:10px 14px}
+.exl .m{font-weight:700}
+.exl .e{color:var(--muted);font-size:14px}
+s{color:var(--red);text-decoration-color:var(--red)}
+code{font:500 14px var(--mono);background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+
+/* builder */
+.builder{background:var(--panel);border-radius:18px;box-shadow:var(--shadow);padding:clamp(18px,3vw,26px);margin:18px 0}
+.builder .inrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#root{flex:1;min-width:180px;font:500 20px var(--body);color:var(--ink);background:var(--ground);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.chipbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.chip{font:600 13px var(--body);border:1px solid var(--line);background:var(--ground);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip:hover{border-color:var(--green)}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:18px}
+.o{border:1px solid var(--line);border-radius:14px;padding:13px 15px;background:var(--ground)}
+.o .form{font-family:var(--display);font-size:24px;color:var(--green);word-break:break-word}
+.o .pat{font:600 11px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.o .mean{font-size:14px;color:var(--muted);margin-top:4px}
+.sent{display:grid;gap:6px;margin:16px 0}
+.sent .parse{display:flex;gap:8px;flex-wrap:wrap}
+.tok{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 10px;font-size:14px;text-align:center}
+.tok b{display:block;color:var(--green)}
+.tok span{font-size:12px;color:var(--muted)}
+.topbar{display:none}
+.home{font:600 13px var(--body);color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 2px}
+.home:hover{color:var(--ink)}
+.home:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.theme-btn svg{flex:none}
+.aside-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.theme-btn{font:600 13px var(--body);color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.theme-btn:hover{border-color:var(--muted)}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:14px 16px}
+  aside nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+  nav .grp{display:none}
+  nav a{white-space:nowrap}
+  main{padding:18px 16px 60px}
+}
+</style>
+<div class="shell">
+<aside>
+  <div class="aside-top"><a class="home" href="./">← All apps</a><button class="theme-btn" type="button" aria-label="Switch theme"></button></div>
+  <p class="logo">Enjin Bahasa<span>How Malay is built</span></p>
+  <input type="search" id="q" placeholder="Search this page…" aria-label="Search">
+  <nav id="nav"></nav>
+</aside>
+<main id="main">
+<div class="hero">
+  <div class="eyebrow">Grammar reference · Bahasa Melayu</div>
+  <h1>Malay is a machine for making words</h1>
+  <p>Learn a few hundred roots and a dozen affixes, and you can build and decode thousands of words you were never taught. This page is the engine room: the affixes, the sound rules, the sentence patterns, and the register shifts — with a builder that applies the rules for you.</p>
+</div>
+<section id="engine" data-g="The engine"><h2>1 · Roots and affixes<em>Why one word teaches you ten</em></h2>
+<p>Almost every Malay word is a <b>root</b> (<i>kata dasar</i>) wearing affixes. The root carries the meaning; the affixes say what role it plays — an action, a doer, a result, an abstract quality. Dictionaries list words under the root, so stripping affixes is also how you look things up.</p>
+<div class="tbl"><table><thead><tr><th>Root</th><th>The family it grows</th></tr></thead><tbody>
+<tr><td>ajar <span style="font-weight:400;color:var(--muted)">teach</span></td><td><b class="ms">belajar</b> study · <b class="ms">mengajar</b> teach · <b class="ms">pelajar</b> student · <b class="ms">pengajar</b> instructor · <b class="ms">pelajaran</b> lesson · <b class="ms">pengajaran</b> the teaching of / moral · <b class="ms">terpelajar</b> educated</td></tr>
+<tr><td>kerja <span style="font-weight:400;color:var(--muted)">work</span></td><td><b class="ms">bekerja</b> to work · <b class="ms">mengerjakan</b> work on sth · <b class="ms">pekerja</b> worker · <b class="ms">pekerjaan</b> occupation · <b class="ms">kerjasama</b> cooperation</td></tr>
+<tr><td>tulis <span style="font-weight:400;color:var(--muted)">write</span></td><td><b class="ms">menulis</b> to write · <b class="ms">menuliskan</b> write sth down for · <b class="ms">penulis</b> writer · <b class="ms">tulisan</b> writing, script · <b class="ms">ditulis</b> is written · <b class="ms">bertulis</b> bearing writing</td></tr>
+<tr><td>besar <span style="font-weight:400;color:var(--muted)">big</span></td><td><b class="ms">membesar</b> grow bigger · <b class="ms">membesarkan</b> enlarge, raise a child · <b class="ms">pembesar</b> dignitary · <b class="ms">kebesaran</b> greatness; too big · <b class="ms">terbesar</b> biggest</td></tr>
+<tr><td>satu <span style="font-weight:400;color:var(--muted)">one</span></td><td><b class="ms">bersatu</b> unite · <b class="ms">menyatukan</b> unify sth · <b class="ms">kesatuan</b> union · <b class="ms">persatuan</b> association · <b class="ms">penyatuan</b> unification · <b class="ms">sesuatu</b> something</td></tr>
+<tr><td>guna <span style="font-weight:400;color:var(--muted)">use</span></td><td><b class="ms">menggunakan</b> to use · <b class="ms">berguna</b> useful · <b class="ms">pengguna</b> user, consumer · <b class="ms">penggunaan</b> usage · <b class="ms">kegunaan</b> utility, purpose · <b class="ms">digunakan</b> is used</td></tr>
+<tr><td>masuk <span style="font-weight:400;color:var(--muted)">enter</span></td><td><b class="ms">memasuki</b> enter sth · <b class="ms">memasukkan</b> put sth in · <b class="ms">kemasukan</b> admission, entry · <b class="ms">pemasukan</b> insertion · <b class="ms">termasuk</b> included</td></tr>
+<tr><td>jalan <span style="font-weight:400;color:var(--muted)">road, walk</span></td><td><b class="ms">berjalan</b> to walk, to run (of a system) · <b class="ms">menjalankan</b> operate, carry out · <b class="ms">perjalanan</b> journey · <b class="ms">jalanan</b> the streets · <b class="ms">sejalan</b> in step with</td></tr>
+</tbody></table></div>
+<div class="rule"><b>How to read an unknown word</b>Peel from the outside in. <code>memperkenalkan</code> → strip <code>mem-</code> and <code>-kan</code> → <code>perkenal</code> → strip <code>per-</code> → <b class="ms">kenal</b> (know, recognise). So: "cause someone to become acquainted" = to introduce.</div>
+</section>
+
+<section id="builder" data-g="Word builder"><h2>2 · Word builder<em>Type a root, see what it becomes</em></h2>
+<p>This applies the real sound rules (the ones in section 3) to any root you type. Glosses are patterns, not dictionary entries — not every form exists for every root, but the shapes are always these.</p>
+<div class="builder">
+  <div class="inrow"><input id="root" placeholder="type a root — e.g. tulis" value="tulis" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="chip" id="go">Build</button></div>
+  <div class="chipbar" id="samples"></div>
+  <div class="out" id="out"></div>
+</div>
+</section>
+
+<section id="men" data-g="meN- verbs"><h2>3 · meN- and its sound changes<em>The single most important rule in Malay</em></h2>
+<p><b class="ms">meN-</b> makes an active verb. The <b>N</b> changes shape to match the first sound of the root — and four letters <b>disappear</b> into it.</p>
+<div class="tbl"><table><thead><tr><th>Root begins</th><th>Prefix</th><th>Examples</th></tr></thead><tbody>
+<tr><td>l, m, n, r, w, y, ng, ny</td><td>me-</td><td>lihat → <b class="ms">melihat</b> · masak → <b class="ms">memasak</b> · rasa → <b class="ms">merasa</b> · nyanyi → <b class="ms">menyanyi</b></td></tr>
+<tr><td>b, f, v</td><td>mem-</td><td>baca → <b class="ms">membaca</b> · fitnah → <b class="ms">memfitnah</b></td></tr>
+<tr><td><b>p</b> → drops</td><td>mem-</td><td>pakai → <b class="ms">memakai</b> · potong → <b class="ms">memotong</b> · pukul → <b class="ms">memukul</b></td></tr>
+<tr><td>c, d, j, z</td><td>men-</td><td>cari → <b class="ms">mencari</b> · dengar → <b class="ms">mendengar</b> · jual → <b class="ms">menjual</b></td></tr>
+<tr><td><b>t</b> → drops</td><td>men-</td><td>tulis → <b class="ms">menulis</b> · tolong → <b class="ms">menolong</b> · tutup → <b class="ms">menutup</b></td></tr>
+<tr><td>vowels, g, h, kh</td><td>meng-</td><td>ambil → <b class="ms">mengambil</b> · guna → <b class="ms">mengguna(kan)</b> · hantar → <b class="ms">menghantar</b></td></tr>
+<tr><td><b>k</b> → drops</td><td>meng-</td><td>kira → <b class="ms">mengira</b> · kirim → <b class="ms">mengirim</b> · kunci → <b class="ms">mengunci</b></td></tr>
+<tr><td><b>s</b> → drops</td><td>meny-</td><td>sapu → <b class="ms">menyapu</b> · simpan → <b class="ms">menyimpan</b> · sewa → <b class="ms">menyewa</b></td></tr>
+<tr><td>one-syllable roots</td><td>menge-</td><td>cat → <b class="ms">mengecat</b> · bom → <b class="ms">mengebom</b> · pos → <b class="ms">mengepos</b></td></tr>
+</tbody></table></div>
+<div class="rule"><b>The four that vanish: K · T · S · P</b>Remember them as <i>KiTa SePakat</i> ("we agree"). They only vanish when a vowel follows: <b class="ms">kritik → mengkritik</b>, <b class="ms">proses → memproses</b> keep their consonant because a consonant follows.</div>
+<h3>Spoken Malay drops the prefix</h3>
+<p>In conversation the bare root is normal and sounds natural: <i>Saya <b>beli</b> roti</i> rather than <i>Saya <b>membeli</b> roti</i>. Keep meN- for writing, formal speech, and the news.</p>
+</section>
+
+<section id="suffix" data-g="-kan and -i"><h2>4 · The suffixes -kan and -i<em>Who or what the action lands on</em></h2>
+<div class="tbl"><table><thead><tr><th>Suffix</th><th>Job</th><th>Examples</th></tr></thead><tbody>
+<tr><td>-kan</td><td>make / cause</td><td>besar → <b class="ms">membesarkan</b> enlarge · bersih → <b class="ms">membersihkan</b> clean · panas → <b class="ms">memanaskan</b> heat up · mati → <b class="ms">mematikan</b> switch off</td></tr>
+<tr><td>-kan</td><td>do it for someone</td><td><b class="ms">belikan</b> buy for · <b class="ms">bukakan</b> open for · <b class="ms">ambilkan</b> fetch for · <i>Tolong <b>bacakan</b> surat ini.</i></td></tr>
+<tr><td>-kan</td><td>move something</td><td><b class="ms">masukkan</b> put in · <b class="ms">keluarkan</b> take out · <b class="ms">hantarkan</b> send off · <b class="ms">naikkan</b> raise</td></tr>
+<tr><td>-i</td><td>act on a place or person</td><td><b class="ms">memasuki</b> enter (a room) · <b class="ms">mendekati</b> approach · <b class="ms">menduduki</b> occupy · <b class="ms">menghadiri</b> attend</td></tr>
+<tr><td>-i</td><td>makes an intransitive verb take an object</td><td>suka → <b class="ms">menyukai</b> like sb/sth · tanda tangan → <b class="ms">menandatangani</b> sign · hadir → <b class="ms">menghadiri</b> attend</td></tr>
+<tr><td>-i</td><td>repeated or spread-out action</td><td><b class="ms">memukuli</b> beat repeatedly · <b class="ms">menanami</b> plant all over</td></tr>
+</tbody></table></div>
+<div class="rule"><b>The contrast that matters</b><b class="ms">masukkan</b> moves a thing <i>into</i> something: <i>Masukkan baju ke dalam beg.</i> <b class="ms">masuki</b> takes the place as its object: <i>Mereka memasuki bilik itu.</i> Same root, two different objects.</div>
+</section>
+
+<section id="ber" data-g="ber-"><h2>5 · ber-<em>Doing, having, being in a state</em></h2>
+<div class="tbl"><table><thead><tr><th>Sense</th><th>Examples</th></tr></thead><tbody>
+<tr><td>an action with no object</td><td>jalan → <b class="ms">berjalan</b> walk · lari → <b class="ms">berlari</b> run · fikir → <b class="ms">berfikir</b> think · cakap → <b class="ms">bercakap</b> speak</td></tr>
+<tr><td>having / wearing / carrying</td><td><b class="ms">berbaju</b> merah in a red shirt · <b class="ms">berumur</b> 25 tahun aged 25 · <b class="ms">beranak</b> dua with two children · <b class="ms">berjaya</b> successful</td></tr>
+<tr><td>travelling by</td><td><b class="ms">berbasikal</b> · <b class="ms">berkereta</b> · <b class="ms">berjalan kaki</b> on foot</td></tr>
+<tr><td>in a group of</td><td><b class="ms">berdua</b> as a pair · <b class="ms">beramai-ramai</b> in a crowd · <b class="ms">berkumpulan</b> in groups</td></tr>
+<tr><td>reciprocal, with -an</td><td><b class="ms">bersalaman</b> shake hands · <b class="ms">berpelukan</b> embrace each other · <b class="ms">bertemuan</b> meet one another</td></tr>
+<tr><td>ber-…-kan (formal "with")</td><td><b class="ms">berdasarkan</b> based on · <b class="ms">beralaskan</b> resting on · <b class="ms">bersumberkan</b> sourced from</td></tr>
+</tbody></table></div>
+<div class="rule"><b>Spelling</b><b class="ms">ber-</b> becomes <b class="ms">be-</b> before a root starting with <i>r</i> (renang → <b class="ms">berenang</b>) and before a root whose first syllable ends in <i>-er</i> (kerja → <b class="ms">bekerja</b>, serta → <b class="ms">beserta</b>). One irregular to memorise: ajar → <b class="ms">belajar</b>.</div>
+</section>
+
+<section id="passive" data-g="Passive di-"><h2>6 · di- and the passive<em>Malay reaches for the passive far more than English</em></h2>
+<div class="tbl"><table><thead><tr><th>Doer</th><th>Pattern</th><th>Example</th></tr></thead><tbody>
+<tr><td>he / she / they / unknown</td><td>di- + root (+ oleh X)</td><td>Surat itu <b class="ms">ditulis oleh</b> Ali. — The letter was written by Ali.</td></tr>
+<tr><td>I / you / we</td><td>pronoun + bare root</td><td>Surat itu <b class="ms">saya tulis</b>. — The letter was written by me.</td></tr>
+<tr><td>notices and signs</td><td>di- + root</td><td><b class="ms">Dilarang merokok.</b> No smoking. · <b class="ms">Dibuka</b> 9 pagi. Opens 9 a.m.</td></tr>
+</tbody></table></div>
+<div class="trap"><b>Never say this</b><s>Surat itu ditulis oleh saya.</s> With I/you/we, the pronoun goes straight in front of the bare verb: <b class="ms">Surat itu saya tulis.</b> Likewise <b class="ms">Kereta itu kami sewa</b>, not <s>disewa oleh kami</s>.</div>
+<h3>Why so much passive?</h3>
+<p>Malay uses the passive to put the important thing first, the way English uses the topic position. News writing is full of it: <i>Lima orang <b class="ms">ditahan</b> polis</i> — five people (were) detained (by) police. When you read Malay news, expect <b class="ms">di-</b> on most main verbs.</p>
+</section>
+
+<section id="ter" data-g="ter-"><h2>7 · ter-<em>Accidental, able, or the most</em></h2>
+<div class="tbl"><table><thead><tr><th>Sense</th><th>Examples</th></tr></thead><tbody>
+<tr><td>accidental, unplanned</td><td><b class="ms">terjatuh</b> fell by accident · <b class="ms">tertidur</b> dozed off · <b class="ms">terlupa</b> forgot · <b class="ms">tersalah</b> did by mistake · <b class="ms">tertelan</b> swallowed accidentally</td></tr>
+<tr><td>resulting state</td><td><b class="ms">terbuka</b> open · <b class="ms">tertutup</b> closed · <b class="ms">terletak</b> is located · <b class="ms">tersusun</b> arranged · <b class="ms">terkenal</b> well known</td></tr>
+<tr><td>the most (superlative)</td><td><b class="ms">terbesar</b> biggest · <b class="ms">tercantik</b> most beautiful · <b class="ms">terbaik</b> best</td></tr>
+<tr><td>able to (usually negated)</td><td><i>Saya tidak <b class="ms">terangkat</b> beg ini.</i> I can't manage to lift this bag.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="nouns" data-g="Making nouns"><h2>8 · Making nouns<em>peN-, -an, ke-…-an, per-…-an</em></h2>
+<div class="tbl"><table><thead><tr><th>Pattern</th><th>Meaning</th><th>Examples</th></tr></thead><tbody>
+<tr><td>peN- + root</td><td>the doer or the tool</td><td><b class="ms">penulis</b> writer · <b class="ms">pembaca</b> reader · <b class="ms">pemandu</b> driver · <b class="ms">pembuka</b> opener · <b class="ms">pengguna</b> user</td></tr>
+<tr><td>pe- + root</td><td>doer of a ber- verb</td><td><b class="ms">pelajar</b> student · <b class="ms">pekerja</b> worker · <b class="ms">pesakit</b> patient</td></tr>
+<tr><td>root + -an</td><td>the result or the thing</td><td><b class="ms">makanan</b> food · <b class="ms">minuman</b> drink · <b class="ms">jawapan</b> answer · <b class="ms">tulisan</b> writing · <b class="ms">bangunan</b> building</td></tr>
+<tr><td>peN- + root + -an</td><td>the process of</td><td><b class="ms">pendidikan</b> education · <b class="ms">penerbangan</b> flight · <b class="ms">pembangunan</b> development · <b class="ms">penggunaan</b> usage</td></tr>
+<tr><td>per- + root + -an</td><td>the matter, the field, the state</td><td><b class="ms">perjalanan</b> journey · <b class="ms">pekerjaan</b> occupation · <b class="ms">perniagaan</b> business · <b class="ms">persatuan</b> association</td></tr>
+<tr><td>ke- + root + -an</td><td>abstract quality or an event that befalls</td><td><b class="ms">kesihatan</b> health · <b class="ms">keselamatan</b> safety · <b class="ms">kebersihan</b> cleanliness · <b class="ms">kemalangan</b> accident · <b class="ms">kehujanan</b> caught in the rain</td></tr>
+<tr><td>ke- + number</td><td>ordinal</td><td><b class="ms">kedua</b> second · <b class="ms">ketiga</b> third (but <b class="ms">pertama</b> = first)</td></tr>
+<tr><td>juru-, -wan / -wati</td><td>professional</td><td><b class="ms">jurutera</b> engineer · <b class="ms">jururawat</b> nurse · <b class="ms">usahawan</b> entrepreneur · <b class="ms">peragawati</b> model</td></tr>
+</tbody></table></div>
+<div class="rule"><b>peN- follows the same sound rules as meN-</b>tulis → menulis → <b class="ms">penulis</b>; pandu → memandu → <b class="ms">pemandu</b>; sapu → menyapu → <b class="ms">penyapu</b>; karang → mengarang → <b class="ms">pengarang</b>.</div>
+</section>
+
+<section id="sentence" data-g="Sentence patterns"><h2>9 · Sentence patterns<em>Ten frames that cover most of what you need to say</em></h2>
+<div class="tbl"><table><thead><tr><th>Pattern</th><th>Frame</th><th>Example</th></tr></thead><tbody>
+<tr><td>X is Y</td><td>noun + noun — no verb "to be"</td><td>Saya pelajar. · Dia doktor.</td></tr>
+<tr><td>X is big</td><td>noun + adjective</td><td>Rumah itu besar.</td></tr>
+<tr><td>X does Y</td><td>S + V + O</td><td>Ali membaca buku.</td></tr>
+<tr><td>X is at Y</td><td>noun + di/ke/dari + place</td><td>Kami di rumah. · Dia ke pejabat.</td></tr>
+<tr><td>there is / has</td><td>ada</td><td>Ada kedai di sini. · Saya ada kereta.</td></tr>
+<tr><td>time</td><td>time word, anywhere — usually first</td><td>Esok saya pergi KL.</td></tr>
+<tr><td>the one that…</td><td>noun + yang + description</td><td>kereta yang merah · orang yang saya jumpa semalam</td></tr>
+<tr><td>passive focus</td><td>object first + di- / pronoun + verb</td><td>Buku itu sudah saya baca.</td></tr>
+<tr><td>command</td><td>bare verb (+ -lah / tolong / sila)</td><td>Duduk. · Tolong tutup pintu. · Datanglah.</td></tr>
+<tr><td>let's</td><td>jom / mari (+ kita)</td><td>Jom makan! · Mari kita mula.</td></tr>
+</tbody></table></div>
+<h3>The one word-order rule</h3>
+<p>The head word comes first; everything describing it follows. Read Malay noun phrases backwards into English:</p>
+<div class="tbl"><table><thead><tr><th>Malay</th><th>Word by word</th><th>English</th></tr></thead><tbody>
+<tr><td>rumah besar itu</td><td>house big that</td><td>that big house</td></tr>
+<tr><td>kereta merah saya</td><td>car red my</td><td>my red car</td></tr>
+<tr><td>buku sejarah Malaysia yang baru</td><td>book history Malaysia which new</td><td>the new Malaysian history book</td></tr>
+<tr><td>pelajar universiti tahun akhir</td><td>student university year final</td><td>final-year university student</td></tr>
+</tbody></table></div>
+<h3>yang — the hinge of complex sentences</h3>
+<p><b class="ms">yang</b> turns anything into a modifier: <i>orang <b>yang</b> tinggi</i> (the tall person), <i>buku <b>yang</b> saya beli</i> (the book I bought), <i><b>yang</b> ini</i> (this one), <i>Apa <b>yang</b> berlaku?</i> (What happened?). If a sentence stretches past a few words, <b class="ms">yang</b> is usually holding it together.</p>
+</section>
+
+<section id="negation" data-g="Negation & questions"><h2>10 · Negation, questions, commands</h2>
+<div class="tbl"><table><thead><tr><th>Word</th><th>Negates</th><th>Example</th></tr></thead><tbody>
+<tr><td>tidak (tak)</td><td>verbs and adjectives</td><td>Saya tidak faham. · Tak mahal.</td></tr>
+<tr><td>bukan</td><td>nouns and pronouns; also contradicts</td><td>Dia bukan doktor. · Bukan itu maksud saya.</td></tr>
+<tr><td>belum</td><td>not yet</td><td>Saya belum makan.</td></tr>
+<tr><td>jangan</td><td>don't (commands)</td><td>Jangan risau. · Jangan lupa!</td></tr>
+<tr><td>tiada / tak ada</td><td>there isn't / doesn't have</td><td>Tiada masalah. · Saya tak ada duit.</td></tr>
+<tr><td>belum pernah</td><td>has never (yet)</td><td>Saya belum pernah ke Sabah.</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><thead><tr><th>Question type</th><th>How</th><th>Example</th></tr></thead><tbody>
+<tr><td>yes/no, spoken</td><td>rising tone, or <b>ke</b> at the end</td><td>Awak lapar? · Betul ke?</td></tr>
+<tr><td>yes/no, formal</td><td>Adakah … ? or word + <b>-kah</b></td><td>Adakah anda bersetuju? · Benarkah?</td></tr>
+<tr><td>tag question</td><td><b>kan?</b> / <b>bukan?</b></td><td>Sedap, kan? · Awak datang, bukan?</td></tr>
+<tr><td>wh-question</td><td>question word sits where the answer would</td><td>Awak nak <b>apa</b>? · <b>Siapa</b> datang? · Dia pergi <b>ke mana</b>?</td></tr>
+<tr><td>soften a command</td><td>tolong / sila / cuba / -lah</td><td>Tolong hantar. · Cubalah.</td></tr>
+</tbody></table></div>
+<div class="rule"><b>Answering naturally</b>Repeat the key word instead of saying "yes": <i>"Awak faham?" — "Faham."</i> / <i>"Tak faham."</i> For <b>belum</b> questions, answer <b>sudah</b> or <b>belum</b>, never <i>ya/tidak</i>.</div>
+</section>
+
+<section id="aspect" data-g="Time & modality"><h2>11 · Time, aspect and modality<em>Verbs never change — these words do the work</em></h2>
+<div class="tbl"><table><thead><tr><th>Marker</th><th>Spoken</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
+<tr><td>sudah / telah</td><td>dah</td><td>already, completed</td><td>Dia sudah balik.</td></tr>
+<tr><td>sedang</td><td>tengah</td><td>in progress</td><td>Saya sedang makan.</td></tr>
+<tr><td>akan</td><td>nak</td><td>will</td><td>Kami akan datang.</td></tr>
+<tr><td>belum</td><td>—</td><td>not yet</td><td>Belum siap.</td></tr>
+<tr><td>pernah</td><td>—</td><td>has ever</td><td>Pernah ke Melaka?</td></tr>
+<tr><td>baru</td><td>—</td><td>just (now)</td><td>Dia baru keluar.</td></tr>
+<tr><td>masih</td><td>—</td><td>still</td><td>Masih sakit.</td></tr>
+<tr><td>boleh</td><td>—</td><td>can, may</td><td>Boleh saya masuk?</td></tr>
+<tr><td>dapat</td><td>—</td><td>manage to, be able</td><td>Saya tak dapat datang.</td></tr>
+<tr><td>mesti / kena</td><td>kena</td><td>must, have to</td><td>Awak kena bayar dulu.</td></tr>
+<tr><td>patut</td><td>—</td><td>should</td><td>Kita patut tanya dia.</td></tr>
+<tr><td>perlu</td><td>—</td><td>need to</td><td>Saya perlu rehat.</td></tr>
+<tr><td>sempat</td><td>—</td><td>have time to</td><td>Tak sempat habiskan.</td></tr>
+<tr><td>mungkin</td><td>—</td><td>maybe</td><td>Mungkin hujan nanti.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="function" data-g="Function words"><h2>12 · Prepositions and connectors<em>The glue</em></h2>
+<div class="tbl"><table><thead><tr><th>Word</th><th>Use</th><th>Example</th></tr></thead><tbody>
+<tr><td>di</td><td>at / in (place) — never movement</td><td>di rumah, di atas meja</td></tr>
+<tr><td>ke</td><td>to (place)</td><td>ke pejabat</td></tr>
+<tr><td>dari / daripada</td><td>from a place / from a person, out of a material, than</td><td>dari KL · daripada ibu · lebih baik daripada</td></tr>
+<tr><td>pada</td><td>at (time), on (a person as location)</td><td>pada pukul 3 · pada pendapat saya</td></tr>
+<tr><td>kepada</td><td>to (a person)</td><td>beri kepada dia</td></tr>
+<tr><td>dengan</td><td>with, by means of, and (joining)</td><td>dengan kawan · dengan bas</td></tr>
+<tr><td>untuk / bagi</td><td>for</td><td>untuk awak</td></tr>
+<tr><td>tentang / mengenai</td><td>about</td><td>tentang kerja</td></tr>
+<tr><td>oleh</td><td>by (in the passive)</td><td>ditulis oleh dia</td></tr>
+<tr><td>sejak</td><td>since</td><td>sejak semalam</td></tr>
+<tr><td>sehingga / hingga</td><td>until, to the point that</td><td>sehingga petang</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><thead><tr><th>Connector</th><th>Meaning</th><th>Register</th></tr></thead><tbody>
+<tr><td>dan · atau · tetapi (tapi)</td><td>and · or · but</td><td>all</td></tr>
+<tr><td>kerana · sebab</td><td>because</td><td>formal · spoken</td></tr>
+<tr><td>jadi · oleh itu · maka</td><td>so, therefore</td><td>spoken · formal · written</td></tr>
+<tr><td>kalau · jika · sekiranya</td><td>if</td><td>spoken · neutral · formal</td></tr>
+<tr><td>supaya · agar</td><td>so that</td><td>neutral · formal</td></tr>
+<tr><td>walaupun · meskipun · namun</td><td>although · even though · nevertheless</td><td>neutral · formal · formal</td></tr>
+<tr><td>apabila · bila · semasa · ketika</td><td>when · when (spoken) · while · at the moment when</td><td>mixed</td></tr>
+<tr><td>sebelum · selepas · kemudian · lepas tu</td><td>before · after · then · then (spoken)</td><td>mixed</td></tr>
+<tr><td>walau bagaimanapun · selain itu · sementara itu · berikutan</td><td>however · besides that · meanwhile · following</td><td>news and essays</td></tr>
+<tr><td>menurut · berdasarkan · mengikut</td><td>according to · based on · as per</td><td>news and reports</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="numbers" data-g="Numbers & classifiers"><h2>13 · Numbers, classifiers, plurals</h2>
+<div class="tbl"><table><thead><tr><th>Block</th><th>Rule</th><th>Example</th></tr></thead><tbody>
+<tr><td>belas</td><td>11–19</td><td>tiga belas = 13</td></tr>
+<tr><td>puluh / ratus / ribu / juta</td><td>tens, hundreds, thousands, millions</td><td>dua ribu lima ratus = 2,500</td></tr>
+<tr><td>se-</td><td>"one" of a block or classifier</td><td>seribu, seorang, sebuah</td></tr>
+<tr><td>ke-</td><td>ordinal</td><td>kelima = fifth (pertama = first)</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><thead><tr><th>Classifier</th><th>Used for</th><th>Example</th></tr></thead><tbody>
+<tr><td>orang</td><td>people</td><td>tiga orang pelajar</td></tr>
+<tr><td>ekor</td><td>animals</td><td>dua ekor kucing</td></tr>
+<tr><td>buah</td><td>big or general objects</td><td>sebuah rumah, dua buah kereta</td></tr>
+<tr><td>biji</td><td>small round things</td><td>sebiji telur</td></tr>
+<tr><td>helai</td><td>cloth, paper, hair</td><td>sehelai baju</td></tr>
+<tr><td>keping</td><td>flat pieces</td><td>dua keping roti</td></tr>
+<tr><td>batang</td><td>long things</td><td>sebatang pen</td></tr>
+<tr><td>pasang</td><td>pairs</td><td>sepasang kasut</td></tr>
+</tbody></table></div>
+<h3>Plurals and reduplication</h3>
+<div class="tbl"><table><thead><tr><th>Type</th><th>Effect</th><th>Examples</th></tr></thead><tbody>
+<tr><td>full doubling</td><td>plural or variety</td><td>buku-buku, kawan-kawan</td></tr>
+<tr><td>doubling + adverb sense</td><td>manner</td><td>cepat-cepat quickly · baik-baik carefully · diam-diam quietly</td></tr>
+<tr><td>doubling + casual action</td><td>doing it around</td><td>jalan-jalan stroll · tengok-tengok browse · makan-makan a casual meal</td></tr>
+<tr><td>doubling of adjectives</td><td>-ish</td><td>kuning-kuning yellowish · kecil-kecil smallish</td></tr>
+<tr><td>rhyming doubling</td><td>fixed words</td><td>lauk-pauk dishes · sayur-mayur vegetables · gunung-ganang mountains · kacau-bilau chaos</td></tr>
+<tr><td>inherently doubled</td><td>single meaning</td><td>kanak-kanak children · kupu-kupu butterfly · tiba-tiba suddenly · kura-kura tortoise</td></tr>
+</tbody></table></div>
+<div class="trap"><b>Don't double after a number or quantity</b><s>dua buku-buku</s> → <b class="ms">dua buku</b>. <s>banyak orang-orang</s> → <b class="ms">banyak orang</b> (or <b class="ms">ramai orang</b> for people).</div>
+</section>
+
+<section id="compare" data-g="Comparison & -nya"><h2>14 · Comparison, se-, and -nya</h2>
+<div class="tbl"><table><thead><tr><th>Pattern</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
+<tr><td>lebih … daripada</td><td>more than</td><td>KL lebih besar daripada Ipoh.</td></tr>
+<tr><td>kurang … daripada</td><td>less than</td><td>Ini kurang pedas daripada itu.</td></tr>
+<tr><td>paling … / ter-</td><td>the most</td><td>paling sedap / tersedap</td></tr>
+<tr><td>se- + adjective</td><td>as … as</td><td>setinggi abangnya</td></tr>
+<tr><td>sama … dengan</td><td>the same as</td><td>sama harga dengan semalam</td></tr>
+<tr><td>terlalu / sangat / agak</td><td>too / very / rather</td><td>terlalu mahal · sangat baik · agak jauh</td></tr>
+<tr><td>se-…-nya</td><td>as … as possible</td><td>secepat mungkin · sebaik-baiknya · sekurang-kurangnya at least</td></tr>
+</tbody></table></div>
+<h3>-nya does four jobs</h3>
+<div class="tbl"><table><thead><tr><th>Job</th><th>Example</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>his / her / its</td><td>rumahnya</td><td>his house</td></tr>
+<tr><td>"the" — something already known</td><td>Harganya berapa?</td><td>What's the price of it?</td></tr>
+<tr><td>exclamation</td><td>Cantiknya! Mahalnya!</td><td>How beautiful! So expensive!</td></tr>
+<tr><td>turns a clause into a noun</td><td>Pada pendapatnya…</td><td>In his opinion…</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="register" data-g="Formal vs spoken"><h2>15 · Two registers, one language<em>Why the textbook and the street sound different</em></h2>
+<div class="tbl"><table><thead><tr><th>Formal (baku)</th><th>Spoken (pasar)</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>tidak</td><td>tak</td><td>not</td></tr>
+<tr><td>hendak / mahu</td><td>nak</td><td>want</td></tr>
+<tr><td>sudah</td><td>dah</td><td>already</td></tr>
+<tr><td>sahaja</td><td>je / jer</td><td>only</td></tr>
+<tr><td>ini / itu</td><td>ni / tu</td><td>this / that</td></tr>
+<tr><td>di / dekat</td><td>kat</td><td>at</td></tr>
+<tr><td>bagaimana</td><td>macam mana</td><td>how</td></tr>
+<tr><td>mengapa</td><td>kenapa / napa</td><td>why</td></tr>
+<tr><td>saya / anda</td><td>aku / kau (close friends only)</td><td>I / you</td></tr>
+<tr><td>membeli, menulis</td><td>beli, tulis (bare root)</td><td>buy, write</td></tr>
+<tr><td>Adakah anda …?</td><td>… ke?</td><td>yes/no question</td></tr>
+</tbody></table></div>
+<h3>Particles — the flavour</h3>
+<div class="tbl"><table><thead><tr><th>Particle</th><th>Effect</th><th>Example</th></tr></thead><tbody>
+<tr><td>-lah</td><td>softens, insists, or persuades</td><td>Okaylah. · Jomlah! · Itulah.</td></tr>
+<tr><td>kan</td><td>…right? seeks agreement</td><td>Sedap, kan?</td></tr>
+<tr><td>ke</td><td>casual question marker</td><td>Nak ikut ke?</td></tr>
+<tr><td>pun</td><td>also, even</td><td>Saya pun tak tahu.</td></tr>
+<tr><td>je / sahaja</td><td>just, only</td><td>Tengok je.</td></tr>
+<tr><td>kot</td><td>I guess, probably</td><td>Dia lupa kot.</td></tr>
+</tbody></table></div>
+<div class="rule"><b>Which to use</b>Write formal Malay in emails, assignments and forms. Speak the shortened forms with friends, drivers and at the mamak. Mixing English in (Manglish) is normal in KL and not a mistake — but learn the formal forms, because that is what you must write.</div>
+</section>
+
+<section id="reading" data-g="Reading real sentences"><h2>16 · Reading a real sentence<em>Decomposition, step by step</em></h2>
+<div class="sent"><div class="exl"><div class="m">Kerajaan akan melaksanakan dasar baharu itu mulai bulan depan.</div><div class="e">The government will implement that new policy starting next month.</div></div>
+<div class="parse">
+<div class="tok"><b>Kerajaan</b><span>government (ke-raja-an: "kingship" → state)</span></div>
+<div class="tok"><b>akan</b><span>will</span></div>
+<div class="tok"><b>melaksanakan</b><span>meN- + laksana + -kan = carry out</span></div>
+<div class="tok"><b>dasar baharu itu</b><span>policy new that</span></div>
+<div class="tok"><b>mulai bulan depan</b><span>starting next month</span></div>
+</div></div>
+<div class="sent"><div class="exl"><div class="m">Lima orang ditahan polis berikutan pergaduhan di sebuah kedai makan semalam.</div><div class="e">Five people were detained by police following a fight at an eatery yesterday.</div></div>
+<div class="parse">
+<div class="tok"><b>Lima orang</b><span>five + classifier for people</span></div>
+<div class="tok"><b>ditahan</b><span>di- + tahan = were detained</span></div>
+<div class="tok"><b>polis</b><span>by the police (oleh is often dropped in headlines)</span></div>
+<div class="tok"><b>berikutan</b><span>following (connector)</span></div>
+<div class="tok"><b>pergaduhan</b><span>per-gaduh-an = a fight</span></div>
+<div class="tok"><b>di sebuah kedai makan</b><span>at an eatery</span></div>
+</div></div>
+<div class="sent"><div class="exl"><div class="m">Tak payah susah-susah, saya boleh tolong ambilkan nanti.</div><div class="e">No need to go to any trouble, I can help fetch it for you later.</div></div>
+<div class="parse">
+<div class="tok"><b>Tak payah</b><span>no need (spoken)</span></div>
+<div class="tok"><b>susah-susah</b><span>doubling = go to trouble</span></div>
+<div class="tok"><b>boleh tolong</b><span>can help</span></div>
+<div class="tok"><b>ambilkan</b><span>ambil + -kan = fetch for someone</span></div>
+<div class="tok"><b>nanti</b><span>later</span></div>
+</div></div>
+<div class="rule"><b>A reading routine that works</b>1 — Find the main verb and check its prefix (meN- active, di- passive, ber- intransitive). 2 — Whatever sits before a di- verb or right after a meN- verb is the key participant. 3 — Strip affixes off any unknown word to find the root. 4 — Treat <b class="ms">yang</b> as an opening bracket: everything after it describes what came before.</div>
+</section>
+
+<section id="traps" data-g="Traps & habits"><h2>17 · Traps for English and Arabic speakers</h2>
+<div class="trap"><b>Don't invent a verb "to be"</b><s>Saya adalah lapar.</s> → <b class="ms">Saya lapar.</b> <i>adalah/ialah</i> belong to formal writing between two nouns, not before adjectives.</div>
+<div class="trap"><b>tidak vs bukan</b>Adjectives and verbs take <b>tidak</b>; nouns take <b>bukan</b>. <s>Dia tidak doktor</s> → <b class="ms">Dia bukan doktor.</b></div>
+<div class="trap"><b>kami vs kita</b>Telling your friend "let's go" with <i>kami</i> excludes them. Use <b class="ms">kita</b> when the listener is included.</div>
+<div class="trap"><b>Adjective order</b>English puts the adjective first; Malay puts the noun first. <s>besar rumah</s> → <b class="ms">rumah besar</b>.</div>
+<div class="trap"><b>Passive by me</b><s>ditulis oleh saya</s> → <b class="ms">saya tulis</b>.</div>
+<div class="trap"><b>Arabic interference</b>Malay borrowed the words, not the grammar: no definite article, no dual, no gender agreement, no verb conjugation for person. <i>kitab</i> is a religious book (an ordinary one is <b class="ms">buku</b>), and <i>sahabat</i> means a close friend in everyday use.</div>
+<div class="rule"><b>Habits that make you sound local</b>Repeat the key word instead of "yes". Use a kinship title (<i>kak, bang, pak cik</i>) instead of "you". Say <b class="ms">tak apa</b> often. Add <b class="ms">-lah</b> sparingly until you feel the rhythm. And greet with <b class="ms">Dah makan?</b> — "have you eaten?" is a real greeting, not an invitation.</div>
+</section>
+
+</main>
+</div>
+<script>/* ── nav ── */
+const secs = [...document.querySelectorAll('section')];
+document.getElementById('nav').innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-id="${s.id}">${i+1}. ${s.dataset.g}</a>`).join('');
+const links = [...document.querySelectorAll('nav a')];
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.dataset.id === e.target.id));
+  }), {rootMargin:'-10% 0px -75% 0px'});
+  secs.forEach(s => io.observe(s));
+}
+
+/* ── search filter ── */
+const q = document.getElementById('q');
+q.addEventListener('input', () => {
+  const v = q.value.trim().toLowerCase();
+  if (!v) { secs.forEach(s => { s.hidden = false; s.querySelectorAll('tbody tr').forEach(r => r.hidden = false); }); links.forEach(a=>a.hidden=false); return; }
+  secs.forEach(s => {
+    let hits = s.dataset.g.toLowerCase().includes(v);
+    s.querySelectorAll('tbody tr').forEach(r => { const m = r.textContent.toLowerCase().includes(v); r.hidden = !m; if (m) hits = true; });
+    if (!hits) hits = s.textContent.toLowerCase().includes(v) && !s.querySelector('tbody');
+    s.hidden = !hits;
+    const link = links.find(a => a.dataset.id === s.id); if (link) link.hidden = !hits;
+  });
+});
+
+/* ── morphology engine ── */
+const V = 'aeiou';
+const isV = c => V.includes(c);
+const syll = r => (r.match(/[aeiou]+/g) || []).length;
+function meN(r){
+  r = r.toLowerCase().trim(); if (!r) return '';
+  const a = r[0], two = r.slice(0,2);
+  if (syll(r) === 1) return 'menge' + r;
+  if ('lmnrwy'.includes(a) || two === 'ng' || two === 'ny') return 'me' + r;
+  if (a === 'p') return 'mem' + (isV(r[1]) ? r.slice(1) : r);
+  if ('bfv'.includes(a)) return 'mem' + r;
+  if (a === 't') return 'men' + (isV(r[1]) ? r.slice(1) : r);
+  if ('cdjz'.includes(a)) return 'men' + r;
+  if (a === 's') return two === 'sy' ? 'men' + r : (isV(r[1]) ? 'meny' + r.slice(1) : 'men' + r);
+  if (a === 'k') return two === 'kh' ? 'meng' + r : 'meng' + (isV(r[1]) ? r.slice(1) : r);
+  return 'meng' + r;                         // vowels, g, h and anything else
+}
+const peN = r => { const m = meN(r); return 'p' + m.slice(1); };   // meN- → peN-
+function ber(r){
+  r = r.toLowerCase().trim(); if (!r) return '';
+  if (r === 'ajar') return 'belajar';
+  if (r[0] === 'r') return 'be' + r;
+  if (/^[^aeiou]*er[^aeiou]/.test(r)) return 'be' + r;   // kerja → bekerja, serta → beserta
+  return 'ber' + r;
+}
+function ter(r){
+  r = r.toLowerCase().trim(); if (!r) return '';
+  if (r[0] === 'r') return 'te' + r;
+  return 'ter' + r;
+}
+const keAn = r => 'ke' + r + 'an';
+const peNan = r => peN(r) + 'an';
+const perAn = r => {
+  if (r === 'ajar') return 'pelajaran';
+  if (r[0] === 'r' || /^[^aeiou]*er[^aeiou]/.test(r)) return 'pe' + r + 'an';   // kerja → pekerjaan
+  return 'per' + r + 'an';
+};
+const kan = r => r + (r.endsWith('k') ? 'kan' : 'kan');
+const suffI = r => r.endsWith('i') ? r : r + 'i';
+
+const FORMS = r => [
+  ['meN- + root', meN(r), 'active verb — the everyday "to ___"'],
+  ['meN- …-kan', meN(r) + 'kan', 'cause it / do it for someone / move it'],
+  ['meN- …-i', meN(suffI(r)), 'act on a place or person; take an object'],
+  ['ber- + root', ber(r), 'do it, have it, be in that state'],
+  ['di- + root', 'di' + r, 'passive — it is ___ed (by him/her/them)'],
+  ['di- …-kan', 'di' + r + 'kan', 'passive of the -kan form'],
+  ['ter- + root', ter(r), 'accidentally ___ / the most ___ / in that state'],
+  ['peN- + root', peN(r), 'the one who ___s, or the tool that does it'],
+  ['root + -an', r + 'an', 'the result or the thing produced'],
+  ['peN- …-an', peNan(r), 'the process of ___ing'],
+  ['per- …-an / pe- …-an', perAn(r), 'the matter, the field, the state of'],
+  ['ke- …-an', keAn(r), 'the abstract quality, or an event that befalls you'],
+  ['se- + root', 'se' + r, 'one ___ / as ___ as / same'],
+  ['root + -lah', r + 'lah', 'softened command or emphasis'],
+];
+const SAMPLES = ['tulis','ajar','kerja','besar','masuk','guna','satu','sapu','pakai','kira','cat','jalan','sedia','fikir'];
+const out = document.getElementById('out'), rootIn = document.getElementById('root');
+document.getElementById('samples').innerHTML = SAMPLES.map(s=>`<button class="chip" data-s="${s}">${s}</button>`).join('');
+document.getElementById('samples').onclick = e => { const b = e.target.closest('[data-s]'); if (!b) return; rootIn.value = b.dataset.s; build(); };
+function build(){
+  const r = rootIn.value.toLowerCase().replace(/[^a-z\- ]/g,'').trim();
+  if (!r) { out.innerHTML = '<p class="o">Type a root to see its family.</p>'; return; }
+  out.innerHTML = FORMS(r).map(([pat, form, mean]) =>
+    `<div class="o"><div class="pat">${pat}</div><div class="form">${form}</div><div class="mean">${mean}</div></div>`).join('')
+    + `<div class="o" style="background:var(--gold-soft);border-color:var(--gold)"><div class="pat">Reality check</div><div class="mean">These are the shapes the rules produce, not a guarantee every one is in use. Most roots use three or four of them. Check a form in PRPM (prpm.dbp.gov.my) before you put it in an email.</div></div>`;
+}
+document.getElementById('go').onclick = build;
+rootIn.addEventListener('input', build);
+build();
+</script>
+
+</body></html>

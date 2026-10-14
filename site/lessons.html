@@ -219,10 +219,10 @@ td b{color:var(--a)}
 .home:hover{color:var(--ink)}
 .home:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 </style>
-<div class="mobile-nav"><a class="home" href="./" aria-label="All decks">←</a><b style="font-family:var(--display);font-weight:400;font-size:18px;white-space:nowrap">Jalan ke Fasih</b><select id="msel" aria-label="Choose lesson"></select><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
+<div class="mobile-nav"><a class="home" href="./" aria-label="All apps">←</a><b style="font-family:var(--display);font-weight:400;font-size:18px;white-space:nowrap">Jalan ke Fasih</b><select id="msel" aria-label="Choose lesson"></select><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
 <div class="shell">
   <aside>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a class="home" href="./">← All decks</a><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a class="home" href="./">← All apps</a><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
     <p class="logo">Jalan ke Fasih</p>
     <p class="logo-sub">Malay, from zero to fluent</p>
     <div class="meter"><div class="track"><i></i></div><b class="pct"></b></div>
@@ -275,7 +275,7 @@ function block(b){
 function overview(){
   return `<div class="wrap"><section class="hero motif a1"><div class="eyebrow">A beginner-to-fluent course · ${D.lessons.length} lessons</div><h1>Jalan ke Fasih</h1><p class="en-t">The road to fluent Malay</p>
   <div class="goal"><b>Progress</b> <span class="pct"></span> lessons complete</div></section>
-  <div class="blk"><p>Four stages take you from your first <i>selamat pagi</i> to building words with prefixes and chatting like a local. Each lesson has clear tables, examples you can listen to, and a short quiz. Pair every lesson with a theme from the <a href="vocabulary.html" style="color:inherit;font-weight:700">Kata Asas</a> vocabulary deck and a scene from the <a href="phrases.html" style="color:inherit;font-weight:700">Frasa Harian</a> phrases deck.</p></div>
+  <div class="blk"><p>Four stages take you from your first <i>selamat pagi</i> to building words with prefixes and chatting like a local. Each lesson has clear tables, examples you can listen to, and a short quiz. Then drill the words in the <a href="trainer.html" style="color:inherit;font-weight:700">Hafal trainer</a>, and look up any pattern in the <a href="grammar.html" style="color:inherit;font-weight:700">Enjin Bahasa</a> grammar engine.</p></div>
   ${D.stages.map((st,si)=>`<h3 class="sub-h">Stage ${si+1} · ${esc(st[0])}</h3><p style="color:var(--muted);margin:-6px 0 10px">${esc(st[1])}</p><div class="overview a${si}">${D.lessons.map((l,i)=>[l,i]).filter(([l])=>l.stage===si).map(([l,i])=>`<button class="ov" data-i="${i}"><span class="eyebrow">Lesson ${i+1}${done[i]?' · ✓ done':''}</span><b lang="ms">${esc(l.ms)}</b><span>${esc(l.title)}</span></button>`).join('')}</div>`).join('')}
   <div class="pager"><span></span><button class="btn primary" data-i="0">Start lesson 1 →</button></div></div>`;
 }

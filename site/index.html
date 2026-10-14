@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Malay Schowl</title>
-<meta name="description" content="A personal Malay study kit: a 23-lesson course, 190 everyday phrases and 333 core words, all with audio.">
+<meta name="description" content="A personal Malay study kit: a 23-lesson course, a 3,368-term spaced-repetition trainer and a grammar engine, all with audio.">
 <meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.ico" sizes="48x48">
@@ -85,7 +85,7 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
   <header class="a1">
     <div class="eyebrow">Bahasa Melayu · Study kit</div>
     <h1>Malay Schowl</h1>
-    <p class="lede">Everything for learning Malay in one place: a structured course, everyday phrases and the core vocabulary — all with audio, quizzes and saved progress.</p>
+    <p class="lede">Everything for learning Malay in one place: a guided course, a trainer that schedules your reviews, and a reference for how the language is built.</p>
   </header>
 
   <main class="decks">
@@ -94,35 +94,36 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
       <div class="body">
         <h2 lang="ms">Jalan ke Fasih</h2>
         <p class="en">The road to fluency</p>
-        <p>23 lessons across 4 stages — sounds, sentences, word-building and sounding natural. Each ends with a quiz.</p>
+        <p>23 guided lessons across 4 stages — sounds, sentences, word-building and sounding natural. Each ends with a quiz.</p>
         <div class="foot"><span class="go">Open course →</span><span class="stat" id="s-lessons">23 lessons</span></div>
         <div class="track"><i id="t-lessons"></i></div>
       </div>
     </a>
-    <a class="deck a1" href="phrases.html">
-      <div class="top motif"><span class="tag">Flashcards</span><span aria-hidden="true">💬</span></div>
+    <a class="deck a1" href="trainer.html">
+      <div class="top motif"><span class="tag">Trainer</span><span aria-hidden="true">🧠</span></div>
       <div class="body">
-        <h2 lang="ms">Frasa Harian</h2>
-        <p class="en">Everyday phrases</p>
-        <p>190 phrases for 19 real situations in Malaysia, from the airport queue to ordering teh tarik.</p>
-        <div class="foot"><span class="go">Open phrases →</span><span class="stat" id="s-phrases">190 phrases</span></div>
+        <h2 lang="ms">Hafal</h2>
+        <p class="en">Memorise 3,368 terms</p>
+        <p>Words and phrases from the core 333 up to news and idiom, in six levels. Spaced repetition tells you what to review each day.</p>
+        <div class="foot"><span class="go">Open trainer →</span><span class="stat" id="s-trainer">3,368 terms</span></div>
+        <div class="track"><i id="t-trainer"></i></div>
       </div>
     </a>
-    <a class="deck a2" href="vocabulary.html">
-      <div class="top motif"><span class="tag">Flashcards</span><span aria-hidden="true">📚</span></div>
+    <a class="deck a3" href="grammar.html">
+      <div class="top motif"><span class="tag">Reference</span><span aria-hidden="true">⚙️</span></div>
       <div class="body">
-        <h2 lang="ms">Kata Asas</h2>
-        <p class="en">Core vocabulary</p>
-        <p>333 essential words as picture cards, each with an example sentence and pronunciation.</p>
-        <div class="foot"><span class="go">Open vocabulary →</span><span class="stat" id="s-vocab">333 words</span></div>
+        <h2 lang="ms">Enjin Bahasa</h2>
+        <p class="en">How Malay is built</p>
+        <p>Roots, affixes and sound rules, sentence patterns and registers — with a word builder that applies the rules for you.</p>
+        <div class="foot"><span class="go">Open grammar →</span><span class="stat">17 sections</span></div>
       </div>
     </a>
   </main>
 
   <section class="how" aria-label="How to use">
-    <div><h3>Listen first</h3><p>Every word and phrase has a speaker button. Audio uses your device's Malay voice when it has one.</p></div>
-    <div><h3>Quiz yourself</h3><p>In the flashcards, press <b>T</b> to hide meanings, then <b>Enter</b> to reveal.</p></div>
-    <div><h3>Pick up where you left off</h3><p>Your place and finished lessons are saved in this browser.</p></div>
+    <div><h3>Learn, then drill</h3><p>Take a lesson in the course, then review its words in the trainer. Look up any pattern in the grammar engine.</p></div>
+    <div><h3>Come back daily</h3><p>The trainer schedules reviews. Open <b>Due</b> each day and clear it — a few minutes beats a long weekly session.</p></div>
+    <div><h3>Listen and repeat</h3><p>Every term has audio in your device's Malay voice. Turn on <b>🐢 Slow</b> in the trainer to hear it at a slower pace.</p></div>
   </section>
 
   <footer>Terima kasih dan selamat belajar!</footer>
@@ -130,17 +131,25 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
 <script>
 (function(){
   const get = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
-  let done = {};
-  try { done = JSON.parse(get('malay-lessons-done') || '{}') || {}; } catch(e) {}
+  const json = k => { try { return JSON.parse(get(k) || '{}') || {}; } catch(e) { return {}; } };
+  const set = (id, text, pct) => {
+    document.getElementById('s-' + id).textContent = text;
+    if (pct !== undefined) document.getElementById('t-' + id).style.width = Math.min(100, pct) + '%';
+  };
+
+  const done = json('malay-lessons-done');
   const n = Object.keys(done).filter(k => done[k]).length;
-  if (n) {
-    document.getElementById('s-lessons').textContent = n + '/23 done';
-    document.getElementById('t-lessons').style.width = Math.min(100, n / 23 * 100) + '%';
+  if (n) set('lessons', n + '/23 done', n / 23 * 100);
+
+  // Same rules as the trainer: practised = t > 0, mastered = n >= 4, due = d <= today
+  const P = json('hafal-p2');
+  const today = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
+  const seen = Object.values(P).filter(r => r && r.t > 0);
+  if (seen.length) {
+    const due = seen.filter(r => r.d <= today).length;
+    const mastered = seen.filter(r => r.n >= 4).length;
+    set('trainer', due ? due + ' due today' : mastered ? mastered + ' mastered' : seen.length + ' practised', seen.length / 3368 * 100);
   }
-  [['malay-phrases-pos','s-phrases'],['malay-vocab-pos','s-vocab']].forEach(([k, id]) => {
-    const v = parseInt(get(k));
-    if (v > 0) document.getElementById(id).textContent = 'Resume · card ' + (v + 1);
-  });
 })();
 </script>
 </body>
