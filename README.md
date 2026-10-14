@@ -8,36 +8,34 @@ My personal Malay study kit: three interactive study apps behind one home page.
 | [`phrases.html`](site/phrases.html) | **Frasa Harian**: 190 everyday phrases for 19 real situations in Malaysia |
 | [`vocabulary.html`](site/vocabulary.html) | **Kata Asas**: 333 core words as picture flashcards with example sentences |
 
-Every page has text-to-speech audio (it uses a Malay voice when your device has one), a quiz mode, and saves your progress in the browser.
+Every page has a light/dark theme switch, text-to-speech audio (it uses a Malay voice when your device has one), a quiz mode, and saves your progress in the browser.
 
 **Flashcard keys:** `←` `→` move · `L` listen · `T` quiz mode · `Enter` reveal
 
-## Run it
+## Where it lives
 
-### Anywhere: GitHub Pages
-Every push to `main` publishes `site/` to GitHub Pages:
-`https://<your-username>.github.io/Malay-Schowl/`
+| | URL |
+| --- | --- |
+| Schowl server | <https://malay.schowl.com> |
+| GitHub Pages | <https://belalelrashidy.github.io/Malay-Schowl/> |
+| Docker image | `ghcr.io/belalelrashidy/malay-schowl:latest` |
 
-One-time setup: **Settings → Pages → Source: GitHub Actions**.
+Every push to `main` runs the [CI/CD pipeline](.github/workflows/ci-cd.yml): it builds and tests the container, then publishes GitHub Pages, publishes the Docker image, and deploys to the Schowl server. Details are in [DEPLOY.md](DEPLOY.md).
 
-### Locally with Docker (always on)
+## Run it yourself
+
+**Docker (local, always on):**
 ```bash
 docker compose up -d --build
 ```
-Open <http://localhost:8080>. The container restarts automatically with Docker, so it stays available.
+Open <http://localhost:8080>. Friendly URLs work: `/lessons`, `/phrases`, `/vocabulary`. Stop with `docker compose down`.
 
-Friendly URLs work too: `/lessons`, `/phrases`, `/vocabulary`.
-
-Stop it with `docker compose down`.
-
-### Prebuilt image from GHCR
-Each push to `main` also publishes a multi-arch image (amd64 + arm64):
+**Prebuilt image (amd64 + arm64):**
 ```bash
-docker run -d --name malay-schowl -p 8080:80 --restart unless-stopped ghcr.io/<your-username>/malay-schowl:latest
+docker run -d --name malay-schowl -p 8080:80 --restart unless-stopped ghcr.io/belalelrashidy/malay-schowl:latest
 ```
 
-### No Docker
-Open `site/index.html` directly in a browser, or run `python3 -m http.server -d site 8080`.
+**No Docker:** open `site/index.html` in a browser, or run `python3 -m http.server -d site 8080`.
 
 ## Layout
 ```
@@ -46,12 +44,15 @@ site/                 the website (plain HTML, no build step)
   lessons.html        course
   phrases.html        phrase flashcards
   vocabulary.html     vocabulary flashcards
+  theme.js            light/dark switcher shared by all pages
 Dockerfile            nginx image serving site/
 nginx.conf            caching, friendly URLs, /healthz
 docker-compose.yml    local always-on container on :8080
-.github/workflows/    Pages deploy + GHCR image publish
+compose.prod.yml      server container, bound to 127.0.0.1:3900
+deploy/               server deploy script + nginx site for malay.schowl.com
+.github/workflows/    CI/CD: test -> Pages + GHCR image + server deploy
 ```
 
 ## Notes
-- Progress is stored per browser and per address, so `localhost:8080` and the GitHub Pages site keep separate progress.
+- Progress and theme are stored per browser and per address, so each URL above keeps its own progress.
 - Fonts load from Google Fonts. Offline, the pages fall back to system fonts and still work.

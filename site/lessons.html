@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="theme.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 </head><body>
 <style>
@@ -205,17 +206,19 @@ td b{color:var(--a)}
   .shell{grid-template-columns:minmax(0,1fr)}
   aside{display:none}
   .mobile-nav{display:flex;gap:8px;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px}
-  .mobile-nav select{flex:1;max-width:none}
+  .mobile-nav select{flex:1;max-width:none;min-width:0}
   main{padding-block:18px 40px}
 }
 .home{font:600 13px var(--body);color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 2px}
+.theme-btn svg{flex:none}
+.mobile-nav .theme-btn{padding:8px 10px}.mobile-nav .theme-label{display:none}
 .home:hover{color:var(--ink)}
 .home:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 </style>
-<div class="mobile-nav"><a class="home" href="./" aria-label="All decks">←</a><b style="font-family:var(--display);font-weight:400;font-size:18px;white-space:nowrap">Jalan ke Fasih</b><select id="msel" aria-label="Choose lesson"></select></div>
+<div class="mobile-nav"><a class="home" href="./" aria-label="All decks">←</a><b style="font-family:var(--display);font-weight:400;font-size:18px;white-space:nowrap">Jalan ke Fasih</b><select id="msel" aria-label="Choose lesson"></select><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
 <div class="shell">
   <aside>
-    <a class="home" href="./" style="margin-bottom:12px">← All decks</a>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a class="home" href="./">← All decks</a><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
     <p class="logo">Jalan ke Fasih</p>
     <p class="logo-sub">Malay, from zero to fluent</p>
     <div class="meter"><div class="track"><i></i></div><b class="pct"></b></div>

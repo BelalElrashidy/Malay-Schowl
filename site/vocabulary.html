@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="theme.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 </head><body>
 <style>
@@ -137,6 +138,8 @@ kbd{font:500 12px var(--mono);border:1px solid var(--line);border-bottom-width:2
 
 .toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 14px;border-radius:12px;font-size:14px;max-width:calc(100% - 32px);box-shadow:var(--shadow);z-index:5}
 .home{font:600 13px var(--body);color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:4px;border-radius:8px;padding:4px 2px}
+.theme-btn svg{flex:none}
+@media (max-width:640px){.theme-btn .theme-label{display:none}}
 .home:hover{color:var(--ink)}
 .home:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 </style>
@@ -147,6 +150,7 @@ kbd{font:500 12px var(--mono);border:1px solid var(--line);border-bottom-width:2
     <select id="jump" aria-label="Jump to section"></select>
     <button class="btn" id="test" aria-pressed="false" title="Hide meanings so you can quiz yourself (T)">Quiz mode</button>
     <button class="btn" id="auto" aria-pressed="false" title="Speak each slide automatically">Auto-play audio</button>
+    <button class="btn theme-btn" type="button" aria-label="Switch theme"></button>
   </header>
   <div class="progress"><i id="prog"></i></div>
   <main class="stage" id="stage"></main>

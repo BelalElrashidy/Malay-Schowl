@@ -1,0 +1,133 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check pages
+        run: |
+          for page in site/*.html; do
+            grep -q '<title>' "$page" || { echo "missing <title> in $page"; exit 1; }
+            grep -q 'src="theme.js"' "$page" || { echo "theme.js not loaded in $page"; exit 1; }
+          done
+
+      - name: Build image
+        run: docker build -t malay-schowl:test .
+
+      - name: Run container and check every URL
+        run: |
+          docker run -d --name app -p 8080:80 malay-schowl:test
+          for i in $(seq 1 20); do curl -fs http://localhost:8080/healthz >/dev/null && break; sleep 1; done
+          for path in / /lessons /phrases /vocabulary /lessons.html /phrases.html /vocabulary.html /theme.js /favicon.svg /healthz; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$path")
+            echo "$code $path"
+            [ "$code" = "200" ] || { docker logs app; exit 1; }
+          done
+
+  pages:
+    name: Deploy GitHub Pages
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  image:
+    name: Publish Docker image
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.name.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: name
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ steps.name.outputs.image }}:latest
+            ${{ steps.name.outputs.image }}:${{ github.sha }}
+
+  deploy:
+    name: Deploy to Schowl server
+    needs: test
+    # Switches on once the SITE_URL repository variable exists (see DEPLOY.md).
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.SITE_URL != ''
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-schowl
+      cancel-in-progress: false
+    environment:
+      name: schowl
+      url: ${{ vars.SITE_URL }}
+    steps:
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          for v in SSH_KEY KNOWN_HOSTS HOST PORT DEPLOY_USER; do
+            [ -n "${!v}" ] || { echo "::error::deploy secret for $v is missing (see DEPLOY.md)"; exit 1; }
+          done
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          printf 'Host schowl\n  HostName %s\n  Port %s\n  User %s\n  IdentityFile ~/.ssh/deploy_key\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n' \
+            "$HOST" "$PORT" "$DEPLOY_USER" > ~/.ssh/config
+
+      - name: Deploy
+        # The server pins this key to /usr/local/bin/malay-schowl-deploy (forced command):
+        # it pulls main, rebuilds the container and health-checks it.
+        run: ssh schowl deploy
+
+      - name: Check public URL
+        run: |
+          for i in $(seq 1 10); do
+            curl -fsS -o /dev/null "${{ vars.SITE_URL }}/healthz" && { echo "live: ${{ vars.SITE_URL }}"; exit 0; }
+            sleep 3
+          done
+          echo "::warning::${{ vars.SITE_URL }} is not reachable yet (check DNS); the container itself is healthy"

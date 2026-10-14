@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script src="theme.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 :root{
@@ -66,12 +67,17 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,88px);lin
 .how div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
 .how h3{margin:0 0 4px;font-size:15px}
 .how p{margin:0;color:var(--muted);font-size:14px}
+.topbar{display:flex;justify-content:flex-end;margin-bottom:8px}
+.btn{font:600 13px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--muted)}
+.btn:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
 footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
 @media (prefers-reduced-motion:reduce){.deck{transition:none}.deck:hover{transform:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="topbar"><button class="btn theme-btn" type="button" aria-label="Switch theme"></button></div>
   <header class="a1">
     <div class="eyebrow">Bahasa Melayu · Study kit</div>
     <h1>Malay Schowl</h1>
