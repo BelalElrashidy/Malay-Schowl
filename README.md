@@ -45,6 +45,7 @@ site/                 the website (plain HTML, no build step)
   phrases.html        phrase flashcards
   vocabulary.html     vocabulary flashcards
   theme.js            light/dark switcher shared by all pages
+  favicon.*, icon-*   bunga raya icon set (+ site.webmanifest for Add to Home Screen)
 Dockerfile            nginx image serving site/
 nginx.conf            caching, friendly URLs, /healthz
 docker-compose.yml    local always-on container on :8080
