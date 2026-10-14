@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Malay Schowl</title>
+<meta name="description" content="A personal Malay study kit: a 23-lesson course, 190 everyday phrases and 333 core words, all with audio.">
+<meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1320" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  color-scheme:light dark;
+  --ground:#F2F4F1; --panel:#FFFFFF; --ink:#15213B; --muted:#5A6477; --line:#DCE1E6;
+  --red:#C23A2E; --green:#2E7A58; --gold:#A26C0B; --indigo:#2F4B8A;
+  --red-soft:#F8E4E1; --green-soft:#DFF0E7; --gold-soft:#F8EDD5; --indigo-soft:#E2E8F5;
+  --shadow:0 1px 2px rgba(21,33,59,.06),0 8px 28px rgba(21,33,59,.08);
+  --display:"Young Serif",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0D1320; --panel:#161E2E; --ink:#E8ECF3; --muted:#9AA5B8; --line:#263047;
+  --red:#EE7A6C; --green:#5FC194; --gold:#E9B650; --indigo:#8FA8E6;
+  --red-soft:#3A1F1E; --green-soft:#16332A; --gold-soft:#3A2E15; --indigo-soft:#1D2946;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  --ground:#0D1320; --panel:#161E2E; --ink:#E8ECF3; --muted:#9AA5B8; --line:#263047;
+  --red:#EE7A6C; --green:#5FC194; --gold:#E9B650; --indigo:#8FA8E6;
+  --red-soft:#3A1F1E; --green-soft:#16332A; --gold-soft:#3A2E15; --indigo-soft:#1D2946;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.a0{--a:var(--red);--as:var(--red-soft)} .a1{--a:var(--green);--as:var(--green-soft)}
+.a2{--a:var(--gold);--as:var(--gold-soft)} .a3{--a:var(--indigo);--as:var(--indigo-soft)}
+.motif{background-color:var(--as);background-image:
+  linear-gradient(45deg,transparent 46%,color-mix(in srgb,var(--a) 17%,transparent) 46% 54%,transparent 54%),
+  linear-gradient(-45deg,transparent 46%,color-mix(in srgb,var(--a) 17%,transparent) 46% 54%,transparent 54%);
+  background-size:26px 26px}
+.wrap{max-width:1040px;margin:0 auto;padding:clamp(28px,6vw,72px) 16px 56px}
+.eyebrow{font:600 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--a)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,88px);line-height:1;margin:8px 0 12px;text-wrap:balance}
+.lede{font-size:clamp(17px,2vw,21px);color:var(--muted);max-width:60ch;margin:0 0 clamp(28px,5vw,48px)}
+.decks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:16px}
+.deck{display:flex;flex-direction:column;background:var(--panel);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);
+  text-decoration:none;color:inherit;border:1.5px solid transparent;transition:transform .15s,border-color .15s}
+.deck:hover{border-color:var(--a);transform:translateY(-2px)}
+.deck:focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+.deck .top{height:132px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.deck .top .tag{position:absolute;left:14px;top:14px;font:600 11px var(--body);letter-spacing:.12em;text-transform:uppercase;
+  background:var(--panel);color:var(--a);border-radius:999px;padding:5px 10px}
+.deck .body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
+.deck h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.05;margin:0}
+.deck .en{font-weight:600;margin:0}
+.deck p{margin:0;color:var(--muted);font-size:15px}
+.deck .foot{margin-top:auto;padding-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.deck .go{font:600 14px var(--body);color:var(--a)}
+.deck .stat{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.track i{display:block;height:100%;background:var(--a);width:0}
+.how{margin-top:clamp(36px,6vw,56px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.how div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.how h3{margin:0 0 4px;font-size:15px}
+.how p{margin:0;color:var(--muted);font-size:14px}
+footer{margin-top:40px;color:var(--muted);font-size:13px;text-align:center}
+@media (prefers-reduced-motion:reduce){.deck{transition:none}.deck:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="a1">
+    <div class="eyebrow">Bahasa Melayu · Study kit</div>
+    <h1>Malay Schowl</h1>
+    <p class="lede">Everything for learning Malay in one place: a structured course, everyday phrases and the core vocabulary — all with audio, quizzes and saved progress.</p>
+  </header>
+
+  <main class="decks">
+    <a class="deck a0" href="lessons.html">
+      <div class="top motif"><span class="tag">Course</span><span aria-hidden="true">🧭</span></div>
+      <div class="body">
+        <h2 lang="ms">Jalan ke Fasih</h2>
+        <p class="en">The road to fluency</p>
+        <p>23 lessons across 4 stages — sounds, sentences, word-building and sounding natural. Each ends with a quiz.</p>
+        <div class="foot"><span class="go">Open course →</span><span class="stat" id="s-lessons">23 lessons</span></div>
+        <div class="track"><i id="t-lessons"></i></div>
+      </div>
+    </a>
+    <a class="deck a1" href="phrases.html">
+      <div class="top motif"><span class="tag">Flashcards</span><span aria-hidden="true">💬</span></div>
+      <div class="body">
+        <h2 lang="ms">Frasa Harian</h2>
+        <p class="en">Everyday phrases</p>
+        <p>190 phrases for 19 real situations in Malaysia, from the airport queue to ordering teh tarik.</p>
+        <div class="foot"><span class="go">Open phrases →</span><span class="stat" id="s-phrases">190 phrases</span></div>
+      </div>
+    </a>
+    <a class="deck a2" href="vocabulary.html">
+      <div class="top motif"><span class="tag">Flashcards</span><span aria-hidden="true">📚</span></div>
+      <div class="body">
+        <h2 lang="ms">Kata Asas</h2>
+        <p class="en">Core vocabulary</p>
+        <p>333 essential words as picture cards, each with an example sentence and pronunciation.</p>
+        <div class="foot"><span class="go">Open vocabulary →</span><span class="stat" id="s-vocab">333 words</span></div>
+      </div>
+    </a>
+  </main>
+
+  <section class="how" aria-label="How to use">
+    <div><h3>Listen first</h3><p>Every word and phrase has a speaker button. Audio uses your device's Malay voice when it has one.</p></div>
+    <div><h3>Quiz yourself</h3><p>In the flashcards, press <b>T</b> to hide meanings, then <b>Enter</b> to reveal.</p></div>
+    <div><h3>Pick up where you left off</h3><p>Your place and finished lessons are saved in this browser.</p></div>
+  </section>
+
+  <footer>Terima kasih dan selamat belajar!</footer>
+</div>
+<script>
+(function(){
+  const get = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
+  let done = {};
+  try { done = JSON.parse(get('malay-lessons-done') || '{}') || {}; } catch(e) {}
+  const n = Object.keys(done).filter(k => done[k]).length;
+  if (n) {
+    document.getElementById('s-lessons').textContent = n + '/23 done';
+    document.getElementById('t-lessons').style.width = Math.min(100, n / 23 * 100) + '%';
+  }
+  [['malay-phrases-pos','s-phrases'],['malay-vocab-pos','s-vocab']].forEach(([k, id]) => {
+    const v = parseInt(get(k));
+    if (v > 0) document.getElementById(id).textContent = 'Resume · card ' + (v + 1);
+  });
+})();
+</script>
+</body>
+</html>

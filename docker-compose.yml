@@ -1,0 +1,8 @@
+services:
+  malay-schowl:
+    build: .
+    image: malay-schowl:latest
+    container_name: malay-schowl
+    ports:
+      - "8080:80"
+    restart: unless-stopped
